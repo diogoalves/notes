@@ -1,8 +1,12 @@
-import { NOTIFICATION_CLEAN, NOTIFICATION_SHOW } from '../actions';
+import {
+  NOTIFICATION_CLEAN,
+  NOTIFICATION_SHOW,
+  ACCOUNT_AUTH_SUCESSFUL
+} from '../actions';
 
 export const initialState = {
   account: {
-    user: null,
+    username: null,
     error: null,
     authenticating: false
   },
@@ -11,7 +15,7 @@ export const initialState = {
     error: null
   },
   notes: [{ id: 1, content: 'lorem ipslum' }],
-  notification: ''
+  notification: null
 };
 
 const reducer = (state = initialState, action) => {
@@ -27,8 +31,17 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         notification: state.notification
-          ? `${state.notification}, '${payload}`
+          ? `${state.notification}, ${payload}`
           : payload
+      };
+
+    case ACCOUNT_AUTH_SUCESSFUL:
+      return {
+        ...state,
+        account: {
+          ...state.account,
+          username: payload
+        }
       };
 
     default:
