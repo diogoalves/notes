@@ -22,7 +22,7 @@ class Notifications extends Component {
   };
 
   render() {
-    const { notification, classes } = this.props;
+    const { notification, show, classes } = this.props;
 
     return (
       <div>
@@ -31,7 +31,7 @@ class Notifications extends Component {
             vertical: 'bottom',
             horizontal: 'center'
           }}
-          open={notification}
+          open={show}
           transitionDuration={100}
           onClose={this.handleClose}
           onExited={this.handleClose}
@@ -57,6 +57,7 @@ class Notifications extends Component {
 }
 
 const mapStateToProps = state => ({
+  show: state.notification !== null,
   notification: state.notification
 });
 

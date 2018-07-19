@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -8,6 +8,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Button from '@material-ui/core/Button';
 import LoginDialog from './LoginDialog';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import actions from '../actions';
 
 const styles = {
   root: {
@@ -24,16 +26,11 @@ const styles = {
 
 class MenuAppBar extends React.Component {
   state = {
-    auth: true,
-    anchorEl: null
+    showLogin: false
   };
 
-  handleChange = (event, checked) => {
-    this.setState({ auth: checked });
-  };
-
-  handleMenu = event => {
-    this.setState({ anchorEl: event.currentTarget });
+  toggleShowLogin = () => {
+    this.setState(state => ({ showLogin: !state.showLogin }));
   };
 
   handleClose = () => {
@@ -41,8 +38,8 @@ class MenuAppBar extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { auth } = this.state;
+    const { showLogin } = this.state;
+    const { username, classes, signIn, signOut, signUp } = this.props;
 
     return (
       <div className={classes.root}>
@@ -62,33 +59,51 @@ class MenuAppBar extends React.Component {
             >
               Notes
             </Typography>
-            {!auth && (
+            {!username && (
               <div>
-                <Button onClick={this.toggle} color="inherit">
-                  Sign Up
-                </Button>
-                <Button onClick={this.toggle} color="inherit">
+                <Button onClick={this.toggleShowLogin} color="inherit">
                   Login
                 </Button>
               </div>
             )}
-            {auth && (
+            {username && (
               <div>
                 <Button onClick={this.toggle} color="inherit">
+                  <AccountCircle />
+                  {username}
+                </Button>
+                <Button onClick={signOut} color="inherit">
                   Logout
                 </Button>
               </div>
             )}
           </Toolbar>
         </AppBar>
-        <LoginDialog isSignUp={true} />
+        <LoginDialog
+          show={showLogin}
+          toggle={this.toggleShowLogin}
+          signIn={signIn}
+          signOut={signOut}
+          signUp={signUp}
+        />
       </div>
     );
   }
 }
 
-MenuAppBar.propTypes = {
-  classes: PropTypes.object.isRequired
-};
+const mapStateToProps = state => ({
+  username: state.account.username
+});
 
-export default withStyles(styles)(MenuAppBar);
+const mapDispatchToProps = dispatch => ({
+  signIn: (username, password) =>
+    dispatch(actions.signInAccount({ username, password })),
+  signOut: () => dispatch(actions.signOutAccount()),
+  signUp: (username, password) =>
+    dispatch(actions.signUpAccount({ username, password }))
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withStyles(styles)(MenuAppBar));

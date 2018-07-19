@@ -8,71 +8,56 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 class LoginDialog extends Component {
   state = {
-    open: false
+    username: '',
+    password: ''
   };
 
-  handleClickOpen = () => {
-    this.setState({ open: true });
-  };
-
-  handleClose = () => {
-    this.setState({ open: false });
-  };
-
-  handleSubmit = () => {
-    console.log('submit');
+  handleChange = field => event => {
+    this.setState({
+      [field]: event.target.value.trim()
+    });
   };
 
   render() {
-    const { isSignUp } = this.props;
+    const { username, password } = this.state;
+    const { show, toggle, signIn, signUp } = this.props;
     return (
-      <div>
-        <Button onClick={this.handleClickOpen}>Open form dialog</Button>
-        <Dialog
-          open={this.state.open}
-          onClose={this.handleClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Login</DialogTitle>
-          <DialogContent>
-            <form onSubmit={this.handleSubmit}>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="email"
-                label="Email Address"
-                type="email"
-                fullWidth
-              />
+      <Dialog open={show} onClose={toggle} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Log in</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="email"
+            label="Email Address"
+            type="email"
+            fullWidth
+            onChange={this.handleChange('username')}
+            value={username}
+          />
 
-              <TextField
-                margin="dense"
-                id="password"
-                label="Password"
-                type="password"
-                fullWidth
-              />
-              {isSignUp && (
-                <TextField
-                  margin="dense"
-                  id="confirmation"
-                  label="Confirm Password"
-                  type="password"
-                  fullWidth
-                />
-              )}
-            </form>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.handleSubmit} color="primary">
-              {isSignUp ? 'Sign Up' : 'Login'}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+          <TextField
+            margin="dense"
+            id="password"
+            label="Password"
+            type="password"
+            fullWidth
+            onChange={this.handleChange('password')}
+            value={password}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={toggle} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => signIn(username, password)} color="primary">
+            Login
+          </Button>
+          <Button onClick={() => signUp(username, password)} color="primary">
+            Sign Up
+          </Button>
+        </DialogActions>
+      </Dialog>
     );
   }
 }
