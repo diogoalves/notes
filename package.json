@@ -21,8 +21,12 @@
   "dependencies": {
     "hoodie": "^28.2.6"
   },
+  "hoodie": {
+    "public": "frontend/build"
+  },
   "scripts": {
     "now-start": "hoodie --inMemory",
-    "start": "cd frontend && npm run build && cd .. && hoodie --inMemory --public frontend/build "
+    "start": "cd frontend && npm run build && cd .. && hoodie --inMemory --loglevel verbose",
+    "dev": "hoodie --inMemory --loglevel verbose --public public"
   }
 }

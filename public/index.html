@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--
+  The line below make the app work offline across all browsers. Use at own risk,
+  see https://github.com/gr2m/appcache-nanny#gotchas
+
+  <html manifest="/manifest.appcache">
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍯.js</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        text-align: center;
+      }
+      html {
+        background: #E8DC6B;
+        color: #0A0B09;
+        font-family: Helvetica, Arial;
+        font-size: 2em;
+        line-height: 1.41;
+        transition: all 1s ease;
+      }
+
+      p {
+        font-size: .8em
+      }
+
+      input {
+        font-size: .7em;
+        display: block;
+        width: 100%;
+        padding: .5em;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🍯.js</h1>
+
+    <p>
+      Portland has <strong>Donut.js</strong>,<br>SF has <strong>Waffle.js</strong>.<br>Whatcha got, LA?
+    </p>
+
+    <p>
+      <form action="">
+        <input placeholder="Say something sweet.js ↵">
+      </form>
+    </p>
+
+    <ul></ul>
+
+    <script src="/hoodie/client.js"></script>
+    <script>
+      const $list = document.querySelector('ul')
+      const $form = document.querySelector('form')
+      const $input = document.querySelector('input')
+
+      $form.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        let name = $input.value.trim().toLowerCase()
+        if (!name) {
+          return
+        }
+
+        name = name.replace(/(\.js)?$/i, '.js')
+
+        hoodie.store.add({name})
+      })
+
+      hoodie.store.on('change', renderItems)
+
+      renderItems()
+      function renderItems () {
+        hoodie.store.findAll().then(docs => {
+          $list.innerHTML = ''
+          docs.forEach((doc) => {
+            const $item = document.createElement('li')
+            $item.textContent = doc.name
+            $list.appendChild($item)
+            $input.value = ''
+          })
+        })
+      }
+
+      hoodie.account.signIn({username: 'foo', password: 'secret'})
+
+      // oops something’s buggin in Hoodie so gotta do this
+      hoodie.store.on('pull', renderItems)
+
+      hoodie.connectionStatus.on('disconnect', () => {
+        document.documentElement.style.filter = 'grayscale(100%)'
+        document.documentElement.style.background = '#eee'
+      })
+
+      hoodie.connectionStatus.on('reconnect', () => {
+        document.documentElement.style.filter = 'grayscale(100%)'
+        document.documentElement.style.background = '#E8DC6B'
+      })
+
+      hoodie.connectionStatus.startChecking({interval: 1000})
+    </script>
+  </body>
+</html>

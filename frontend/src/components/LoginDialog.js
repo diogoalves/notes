@@ -8,7 +8,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 class LoginDialog extends Component {
   state = {
-    open: true
+    open: false
   };
 
   handleClickOpen = () => {
