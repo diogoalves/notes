@@ -1,28 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { createStore, applyMiddleware, compose } from 'redux';
-import createSagaMiddleware from 'redux-saga';
+import { BrowserRouter } from 'react-router-dom';
+import { ApolloProvider } from 'react-apollo';
+import { ApolloClient } from 'apollo-client';
+import { HttpLink } from 'apollo-link-http';
+import { ApolloLink } from 'apollo-client-preset';
+import { InMemoryCache } from 'apollo-cache-inmemory';
 import App from './components/App';
-import reducer, { initialState } from './reducers';
-import sagas from './sagas';
 import registerServiceWorker from './registerServiceWorker';
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const sagaMiddleware = createSagaMiddleware();
-const middleware = [sagaMiddleware];
+import { AUTH_TOKEN } from './constants';
 
-const store = createStore(
-  reducer,
-  initialState,
-  composeEnhancers(applyMiddleware(...middleware))
-);
+const httpLink = new HttpLink({ uri: 'http://localhost:4000' });
 
-sagaMiddleware.run(sagas);
+const middlewareAuthLink = new ApolloLink((operation, forward) => {
+  const token = localStorage.getItem(AUTH_TOKEN);
+  const authorizationHeader = token ? `Bearer ${token}` : null;
+  operation.setContext({
+    headers: {
+      authorization: authorizationHeader
+    }
+  });
+  return forward(operation);
+});
+
+const httpLinkWithAuthToken = middlewareAuthLink.concat(httpLink);
+
+const client = new ApolloClient({
+  link: httpLinkWithAuthToken,
+  cache: new InMemoryCache()
+});
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <BrowserRouter>
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
+  </BrowserRouter>,
   document.getElementById('root')
 );
 

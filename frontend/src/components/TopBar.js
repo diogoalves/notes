@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -9,7 +8,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Button from '@material-ui/core/Button';
 import LoginDialog from './LoginDialog';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import actions from '../actions';
 
 const styles = {
   root: {
@@ -91,19 +89,4 @@ class MenuAppBar extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-  username: state.account.username
-});
-
-const mapDispatchToProps = dispatch => ({
-  signIn: (username, password) =>
-    dispatch(actions.signInAccount({ username, password })),
-  signOut: () => dispatch(actions.signOutAccount()),
-  signUp: (username, password) =>
-    dispatch(actions.signUpAccount({ username, password }))
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(MenuAppBar));
+export default withStyles(styles)(MenuAppBar);
