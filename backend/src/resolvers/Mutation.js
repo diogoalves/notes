@@ -47,8 +47,25 @@ function createNote(parent, args, context, info) {
   )
 }
 
+function updateNote(parent, args, context, info) {
+  const userId = getUserId(context)
+  return context.db.mutation.updateNote(
+    {
+      data: {
+        content: args.content,
+        createdBy: { connect: { id: userId } }
+      },
+      where: {
+        id: args.id
+      }
+    },
+    info,
+  )
+}
+
 module.exports = {
     signup,
     login,
-    createNote
+    createNote,
+    updateNote
 }
