@@ -36,7 +36,12 @@ class ListNotes extends Component {
     const { notes } = data;
     return (
       <div>
-        <Button className={classes.button} variant="contained" color="primary">
+        <Button
+          className={classes.button}
+          onClick={this.open('new')}
+          variant="contained"
+          color="primary"
+        >
           NEW NOTE
         </Button>
 
