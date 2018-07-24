@@ -1,0 +1,23 @@
+# import Note from "./generated/prisma.graphql"
+type Query {
+  notes: [Note!]!
+  note(id: ID!): Note
+}
+
+type  Mutation {
+  signup(email: String!, password: String!, name: String!): AuthPayload
+  login(email: String!, password: String!): AuthPayload
+  createNote(content: String!): Note!
+}
+
+type AuthPayload {
+  token: String
+  user: User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  notes: [Note!]!
+}
