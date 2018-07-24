@@ -6,8 +6,9 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Button from '@material-ui/core/Button';
-import LoginDialog from './LoginDialog';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import { cleanLoggedUser } from '../utils';
+import { withRouter } from 'react-router';
 
 const styles = {
   root: {
@@ -22,23 +23,14 @@ const styles = {
   }
 };
 
-class MenuAppBar extends React.Component {
-  state = {
-    showLogin: false
-  };
-
-  toggleShowLogin = () => {
-    this.setState(state => ({ showLogin: !state.showLogin }));
-  };
-
-  handleClose = () => {
-    this.setState({ anchorEl: null });
+class Header extends React.Component {
+  handleLogout = () => {
+    cleanLoggedUser();
+    this.props.history.push(`/`);
   };
 
   render() {
-    const { showLogin } = this.state;
-    const { username, classes, signIn, signOut, signUp } = this.props;
-
+    const { classes, user } = this.props;
     return (
       <div className={classes.root}>
         <AppBar position="static">
@@ -57,36 +49,22 @@ class MenuAppBar extends React.Component {
             >
               Notes
             </Typography>
-            {!username && (
-              <div>
-                <Button onClick={this.toggleShowLogin} color="inherit">
-                  Login
-                </Button>
-              </div>
-            )}
-            {username && (
+            {user && (
               <div>
                 <Button onClick={this.toggle} color="inherit">
                   <AccountCircle />
-                  {username}
+                  {user}
                 </Button>
-                <Button onClick={signOut} color="inherit">
+                <Button onClick={this.handleLogout} color="inherit">
                   Logout
                 </Button>
               </div>
             )}
           </Toolbar>
         </AppBar>
-        <LoginDialog
-          show={showLogin}
-          toggle={this.toggleShowLogin}
-          signIn={signIn}
-          signOut={signOut}
-          signUp={signUp}
-        />
       </div>
     );
   }
 }
 
-export default withStyles(styles)(MenuAppBar);
+export default withRouter(withStyles(styles)(Header));
