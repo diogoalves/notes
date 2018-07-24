@@ -8,7 +8,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Button from '@material-ui/core/Button';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { cleanLoggedUser } from '../utils';
-import { withRouter } from 'react-router';
 
 const styles = {
   root: {
@@ -60,6 +59,9 @@ class Header extends React.Component {
                 </Button>
               </div>
             )}
+            <Button onClick={this.handleLogout} color="inherit">
+              SAVE
+            </Button>
           </Toolbar>
         </AppBar>
       </div>
@@ -67,4 +69,4 @@ class Header extends React.Component {
   }
 }
 
-export default withRouter(withStyles(styles)(Header));
+export default withStyles(styles)(Header);
