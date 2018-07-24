@@ -34,38 +34,39 @@ async function login(parent, args, context, info) {
   }
 }
 
-function createNote(parent, args, context, info) {
-  const userId = getUserId(context)
-  return context.db.mutation.createNote(
-    {
-      data: {
-        content: args.content,
-        createdBy: { connect: { id: userId } },
+// todo check if use can update the note
+function saveNote(parent, args, context, info) {
+  const userId = getUserId(context);
+  const noteId = args.id;
+  if(noteId === 'new') {
+    return context.db.mutation.createNote(
+      {
+        data: {
+          content: args.content,
+          createdBy: { connect: { id: userId } },
+        },
       },
-    },
-    info,
-  )
-}
+      info,
+    );
+  } else {
+    return context.db.mutation.updateNote(
+      {
+        data: {
+          content: args.content,
+          createdBy: { connect: { id: userId } }
+        },
+        where: {
+          id: noteId
+        }
+      },
+      info,
+    );
+  }
 
-function updateNote(parent, args, context, info) {
-  const userId = getUserId(context)
-  return context.db.mutation.updateNote(
-    {
-      data: {
-        content: args.content,
-        createdBy: { connect: { id: userId } }
-      },
-      where: {
-        id: args.id
-      }
-    },
-    info,
-  )
 }
 
 module.exports = {
     signup,
     login,
-    createNote,
-    updateNote
+    saveNote
 }

@@ -80,21 +80,15 @@ class Editor extends Component {
 
   _save = async () => {
     const currentId = this.props.match.params.id;
-    if (currentId === 'new') {
-      const result = await this.props.createNoteMutation({
-        variables: {
-          content: this.state.value
-        }
-      });
-      const { id } = result.data.createNote;
+    const result = await this.props.saveNoteMutation({
+      variables: {
+        id: currentId,
+        content: this.state.value
+      }
+    });
+    const { id } = result.data.saveNote;
+    if (currentId !== id) {
       this.props.history.push(`/note/${id}`);
-    } else {
-      await this.props.updateNoteMutation({
-        variables: {
-          id: currentId,
-          content: this.state.value
-        }
-      });
     }
   };
 }
@@ -112,23 +106,9 @@ const NOTE_QUERY = gql`
 `;
 
 // todo make an update in local store
-const CREATENOTE_MUTATION = gql`
-  mutation CreateNoteMutation($content: String!) {
-    createNote(content: $content) {
-      id
-      content
-      createdBy {
-        id
-        name
-      }
-    }
-  }
-`;
-
-// todo make an update in local store
-const UPDATENOTE_MUTATION = gql`
-  mutation UpdateNoteMutation($id: ID!, $content: String!) {
-    updateNote(id: $id, content: $content) {
+const SAVENOTE_MUTATION = gql`
+  mutation SaveNoteMutation($id: ID!, $content: String!) {
+    saveNote(id: $id, content: $content) {
       id
       content
       createdBy {
@@ -149,6 +129,5 @@ export default compose(
       };
     }
   }),
-  graphql(CREATENOTE_MUTATION, { name: 'createNoteMutation' }),
-  graphql(UPDATENOTE_MUTATION, { name: 'updateNoteMutation' })
+  graphql(SAVENOTE_MUTATION, { name: 'saveNoteMutation' })
 )(withStyles(styles)(Editor));
