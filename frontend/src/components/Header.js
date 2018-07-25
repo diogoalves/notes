@@ -26,8 +26,10 @@ const styles = {
 class Header extends React.Component {
   handleLogout = () => {
     cleanLoggedUser();
-    this.props.history.push(`/`);
+    this.goRoot();
   };
+
+  goRoot = () => this.props.history.push(`/`);
 
   render() {
     const { classes } = this.props;
@@ -36,13 +38,17 @@ class Header extends React.Component {
       <div className={classes.root}>
         <AppBar className={classes.appbar}>
           <Toolbar>
-            <Typography
-              variant="title"
-              color="inherit"
-              className={classes.flex}
-            >
-              Notes
-            </Typography>
+            <div className={classes.flex}>
+              <Button onClick={this.goRoot} color="inherit">
+                <Typography
+                  variant="title"
+                  color="inherit"
+                  className={classes.flex}
+                >
+                  Notes
+                </Typography>
+              </Button>
+            </div>
             {this.props.children}
             {user && (
               <div>

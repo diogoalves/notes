@@ -18,7 +18,8 @@ const styles = theme => ({
   paper: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2
+    paddingBottom: theme.spacing.unit * 2,
+    height: '100%'
   },
   input: {
     marginLeft: theme.spacing.unit,
@@ -54,11 +55,11 @@ class Editor extends Component {
     if (data && data.error) {
       return <div>Error</div>;
     }
-    const { classes = {} } = this.props;
+    const { classes, history } = this.props;
     const { value } = this.state;
     return (
       <div className={classes.root}>
-        <Header {...this.props}>
+        <Header history={history}>
           <Button
             className={classes.button}
             onClick={this._save}
@@ -67,9 +68,18 @@ class Editor extends Component {
           >
             SAVE
           </Button>
+          <Button
+            className={classes.button}
+            onClick={this.back}
+            variant="contained"
+            color="secondary"
+          >
+            BACK
+          </Button>
         </Header>
         <Paper className={classes.paper} elevation={1}>
           <Input
+            autoFocus
             className={classes.input}
             value={value}
             onChange={this.handleChange}
@@ -94,6 +104,10 @@ class Editor extends Component {
     // this.props.history.push(`/note/${id}`);
     this.props.history.push(`/`);
     // }
+  };
+
+  back = () => {
+    this.props.history.push(`/`);
   };
 }
 
