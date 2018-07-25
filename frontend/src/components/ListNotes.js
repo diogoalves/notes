@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -21,6 +21,19 @@ const styles = theme => ({
 class ListNotes extends Component {
   open = id => () => {
     this.props.history.push(`/note/${id}`);
+  };
+
+  delete = id => async () => {
+    await this.props.deleteNoteMutation({
+      variables: {
+        id
+      },
+      update: (store, { data: { deleteNote } }) => {
+        const state = store.readQuery({ query: NOTES_QUERY });
+        //state.notes = state.notes.filter( e => e.id !== deleteNote.id );
+        // store.writeQuery({ query: NOTES_QUERY, state })
+      }
+    });
   };
 
   render() {
@@ -56,6 +69,9 @@ class ListNotes extends Component {
               <Button size="small" onClick={this.open(e.id)}>
                 OPEN
               </Button>
+              <Button size="small" onClick={this.delete(e.id)}>
+                DELETE
+              </Button>
             </CardActions>
           </Card>
         ))}
@@ -79,6 +95,15 @@ export const NOTES_QUERY = gql`
   }
 `;
 
-export default graphql(NOTES_QUERY, { name: 'data' })(
-  withStyles(styles)(ListNotes)
-);
+const DELETENOTE_MUTATION = gql`
+  mutation DeleteNoteMutation($id: ID!) {
+    deleteNote(id: $id) {
+      id
+    }
+  }
+`;
+
+export default compose(
+  graphql(NOTES_QUERY, { name: 'data' }),
+  graphql(DELETENOTE_MUTATION, { name: 'deleteNoteMutation' })
+)(withStyles(styles)(ListNotes));

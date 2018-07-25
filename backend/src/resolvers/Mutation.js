@@ -65,8 +65,22 @@ function saveNote(parent, args, context, info) {
 
 }
 
+function deleteNote(parent, args, context, info) {
+  const userId = getUserId(context);
+  const noteId = args.id;
+  return context.db.mutation.deleteNote(
+    {
+      where: {
+        id: noteId
+      }
+    },
+    info,
+  );
+}
+
 module.exports = {
     signup,
     login,
-    saveNote
+    saveNote,
+    deleteNote
 }
