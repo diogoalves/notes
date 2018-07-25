@@ -10,9 +10,12 @@ import { withStyles } from '@material-ui/core/styles';
 import { shortTitle } from '../utils';
 
 const styles = theme => ({
+  paper: {
+    paddingTop: theme.spacing.unit * 8
+  },
   card: {
     marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit * 2,
+    marginBottom: theme.spacing.unit,
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit
   },
@@ -52,11 +55,11 @@ class ListNotes extends Component {
     if (data && data.error) {
       return <div>Error</div>;
     }
-    const { classes } = this.props;
+    const { classes, history } = this.props;
     const { notes } = data;
     return (
       <div>
-        <Header {...this.props}>
+        <Header history={history}>
           <Button
             className={classes.button}
             onClick={this.open('new')}
@@ -67,23 +70,25 @@ class ListNotes extends Component {
           </Button>
         </Header>
 
-        {notes.map((e, i) => (
-          <Card key={e.id} className={classes.card}>
-            <CardHeader
-              className={classes.card}
-              title={shortTitle(e.content)}
-              subheader={`Create by ${e.createdBy.name} on ${e.createdAt}`}
-            />
-            <CardActions>
-              <Button size="small" onClick={this.open(e.id)}>
-                OPEN
-              </Button>
-              <Button size="small" onClick={this.delete(e.id)}>
-                DELETE
-              </Button>
-            </CardActions>
-          </Card>
-        ))}
+        <div className={classes.paper}>
+          {notes.map((e, i) => (
+            <Card key={e.id} className={classes.card}>
+              <CardHeader
+                className={classes.card}
+                title={shortTitle(e.content)}
+                subheader={`Create by ${e.createdBy.name} on ${e.createdAt}`}
+              />
+              <CardActions>
+                <Button size="small" onClick={this.open(e.id)}>
+                  OPEN
+                </Button>
+                <Button size="small" onClick={this.delete(e.id)}>
+                  DELETE
+                </Button>
+              </CardActions>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
