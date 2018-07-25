@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { AUTH_NAME, AUTH_TOKEN } from './constants';
 
 export const loggedUser = () => localStorage.getItem(AUTH_NAME);
@@ -21,3 +22,5 @@ export const shortTitle = content => {
   }
   return ret;
 };
+
+export const fromNow = time => moment(time).fromNow();

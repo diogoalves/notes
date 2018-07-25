@@ -7,19 +7,13 @@ import CardHeader from '@material-ui/core/CardHeader';
 import CardActions from '@material-ui/core/CardActions';
 import Header from './Header';
 import { withStyles } from '@material-ui/core/styles';
-import { shortTitle } from '../utils';
+import { fromNow, shortTitle } from '../utils';
 
 const styles = theme => ({
   paper: {
-    paddingTop: theme.spacing.unit * 8
+    paddingTop: theme.spacing.unit * 9
   },
   card: {
-    marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit,
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit
-  },
-  button: {
     margin: theme.spacing.unit
   }
 });
@@ -76,7 +70,9 @@ class ListNotes extends Component {
               <CardHeader
                 className={classes.card}
                 title={shortTitle(e.content)}
-                subheader={`Create by ${e.createdBy.name} on ${e.createdAt}`}
+                subheader={`updated by ${e.createdBy.name} ${fromNow(
+                  e.updatedAt
+                )}`}
               />
               <CardActions>
                 <Button size="small" onClick={this.open(e.id)}>
@@ -99,10 +95,8 @@ export const NOTES_QUERY = gql`
     notes {
       id
       content
-      createdAt
       updatedAt
       createdBy {
-        id
         name
       }
     }
