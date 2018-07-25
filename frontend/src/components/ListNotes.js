@@ -5,10 +5,13 @@ import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardActions from '@material-ui/core/CardActions';
+import Header from './Header';
 import { withStyles } from '@material-ui/core/styles';
+import { shortTitle } from '../utils';
 
 const styles = theme => ({
   card: {
+    marginTop: theme.spacing.unit,
     marginBottom: theme.spacing.unit * 2,
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit
@@ -28,10 +31,14 @@ class ListNotes extends Component {
       variables: {
         id
       },
-      update: (store, { data: { deleteNote } }) => {
-        const state = store.readQuery({ query: NOTES_QUERY });
-        //state.notes = state.notes.filter( e => e.id !== deleteNote.id );
-        // store.writeQuery({ query: NOTES_QUERY, state })
+      update: (cache, { data: { deleteNote } }) => {
+        const { notes } = cache.readQuery({ query: NOTES_QUERY });
+        cache.writeQuery({
+          query: NOTES_QUERY,
+          data: {
+            notes: notes.filter(e => e.id !== deleteNote.id)
+          }
+        });
       }
     });
   };
@@ -49,20 +56,22 @@ class ListNotes extends Component {
     const { notes } = data;
     return (
       <div>
-        <Button
-          className={classes.button}
-          onClick={this.open('new')}
-          variant="contained"
-          color="primary"
-        >
-          NEW NOTE
-        </Button>
+        <Header {...this.props}>
+          <Button
+            className={classes.button}
+            onClick={this.open('new')}
+            variant="contained"
+            color="secondary"
+          >
+            NEW NOTE
+          </Button>
+        </Header>
 
         {notes.map((e, i) => (
           <Card key={e.id} className={classes.card}>
             <CardHeader
               className={classes.card}
-              title={e.content}
+              title={shortTitle(e.content)}
               subheader={`Create by ${e.createdBy.name} on ${e.createdAt}`}
             />
             <CardActions>

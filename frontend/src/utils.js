@@ -13,3 +13,11 @@ export const cleanLoggedUser = () => {
   localStorage.removeItem(AUTH_TOKEN);
   localStorage.removeItem(AUTH_NAME);
 };
+
+export const shortTitle = content => {
+  let ret = content.split('\n')[0];
+  if (ret.length >= 30) {
+    ret = `${ret.substring(0, 30)}...`;
+  }
+  return ret;
+};
