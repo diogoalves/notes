@@ -11,6 +11,9 @@ const styles = {
   root: {
     flexGrow: 1
   },
+  appbar: {
+    position: 'fixed'
+  },
   flex: {
     flexGrow: 1
   },
@@ -31,7 +34,7 @@ class Header extends React.Component {
     const user = loggedUser();
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar className={classes.appbar}>
           <Toolbar>
             <Typography
               variant="title"
