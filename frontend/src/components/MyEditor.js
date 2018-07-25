@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Input from '@material-ui/core/Input';
+import Header from './Header';
 
 const styles = theme => ({
   root: {
@@ -54,18 +55,19 @@ class Editor extends Component {
       return <div>Error</div>;
     }
     const { classes = {} } = this.props;
-    //const { note } = data;
     const { value } = this.state;
     return (
       <div className={classes.root}>
-        <Button
-          className={classes.button}
-          onClick={this._save}
-          variant="contained"
-          color="primary"
-        >
-          SAVE
-        </Button>
+        <Header {...this.props}>
+          <Button
+            className={classes.button}
+            onClick={this._save}
+            variant="contained"
+            color="secondary"
+          >
+            SAVE
+          </Button>
+        </Header>
         <Paper className={classes.paper} elevation={1}>
           <Input
             className={classes.input}
@@ -80,16 +82,18 @@ class Editor extends Component {
 
   _save = async () => {
     const currentId = this.props.match.params.id;
-    const result = await this.props.saveNoteMutation({
+    // const result = await this.props.saveNoteMutation({
+    await this.props.saveNoteMutation({
       variables: {
         id: currentId,
         content: this.state.value
       }
     });
-    const { id } = result.data.saveNote;
-    if (currentId !== id) {
-      this.props.history.push(`/note/${id}`);
-    }
+    // const { id } = result.data.saveNote;
+    // if (currentId !== id) {
+    // this.props.history.push(`/note/${id}`);
+    this.props.history.push(`/`);
+    // }
   };
 }
 

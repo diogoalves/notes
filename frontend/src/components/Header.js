@@ -3,11 +3,9 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import Button from '@material-ui/core/Button';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import { cleanLoggedUser } from '../utils';
+import { loggedUser, cleanLoggedUser } from '../utils';
 
 const styles = {
   root: {
@@ -29,18 +27,12 @@ class Header extends React.Component {
   };
 
   render() {
-    const { classes, user } = this.props;
+    const { classes } = this.props;
+    const user = loggedUser();
     return (
       <div className={classes.root}>
         <AppBar position="static">
           <Toolbar>
-            <IconButton
-              className={classes.menuButton}
-              color="inherit"
-              aria-label="Menu"
-            >
-              <MenuIcon />
-            </IconButton>
             <Typography
               variant="title"
               color="inherit"
@@ -48,6 +40,7 @@ class Header extends React.Component {
             >
               Notes
             </Typography>
+            {this.props.children}
             {user && (
               <div>
                 <Button onClick={this.toggle} color="inherit">
@@ -59,9 +52,6 @@ class Header extends React.Component {
                 </Button>
               </div>
             )}
-            <Button onClick={this.handleLogout} color="inherit">
-              SAVE
-            </Button>
           </Toolbar>
         </AppBar>
       </div>
