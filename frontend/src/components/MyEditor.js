@@ -36,18 +36,16 @@ class Editor extends Component {
     value: ''
   };
 
-  componentWillReceiveProps(newProps) {
-    if (newProps && newProps.data && newProps.data.note) {
-      this.setState({
-        value: newProps.data.note.content || ''
-      });
-    }
-  }
+  componentDidMount = () => {
+    const { note = {} } = this.props.data;
+    this.setState({ value: note.content });
+  };
 
   handleChange = event => this.setState({ value: event.target.value });
 
   render() {
     const { data } = this.props;
+
     if (data && data.loading) {
       return <div>Loading</div>;
     }
@@ -116,7 +114,6 @@ const NOTE_QUERY = gql`
     note(id: $id) {
       content
       createdBy {
-        id
         name
       }
     }
@@ -130,7 +127,6 @@ const SAVENOTE_MUTATION = gql`
       id
       content
       createdBy {
-        id
         name
       }
     }
