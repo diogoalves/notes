@@ -1,11 +1,61 @@
 import React, { Component } from 'react';
-import { graphql, compose } from 'react-apollo';
+import { graphql, Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Input from '@material-ui/core/Input';
 import Header from './Header';
+
+class Editor extends Component {
+  state = { value: '' };
+
+  handleChange = event => this.setState({ value: event.target.value });
+
+  render() {
+    const {
+      classes,
+      history,
+      match: {
+        params: { id }
+      }
+    } = this.props;
+    return (
+      <div className={classes.root}>
+        <MyHeader classes={classes} history={history} save={this.save} />
+        <Query query={NOTE_QUERY} variables={{ id }}>
+          {({ loading, error, data }) => {
+            if (loading) return 'Loading...';
+            if (error) return `Error! ${error.message}`;
+
+            return (
+              <Paper className={classes.paper} elevation={1}>
+                <Input
+                  autoFocus
+                  className={classes.input}
+                  onChange={this.handleChange}
+                  multiline
+                  defaultValue={data.note ? data.note.content : ''}
+                />
+              </Paper>
+            );
+          }}
+        </Query>
+      </div>
+    );
+  }
+
+  save = async () => {
+    const currentId = this.props.match.params.id;
+    await this.props.saveNoteMutation({
+      variables: {
+        id: currentId,
+        content: this.state.value
+      }
+    });
+    this.props.history.push(`/`);
+  };
+}
 
 const styles = theme => ({
   root: {
@@ -31,87 +81,10 @@ const styles = theme => ({
   }
 });
 
-class Editor extends Component {
-  state = {
-    value: ''
-  };
-
-  componentDidMount = () => {
-    const { note = {} } = this.props.data;
-    this.setState({ value: note.content });
-  };
-
-  handleChange = event => this.setState({ value: event.target.value });
-
-  render() {
-    const { data } = this.props;
-
-    if (data && data.loading) {
-      return <div>Loading</div>;
-    }
-
-    if (data && data.error) {
-      return <div>Error</div>;
-    }
-    const { classes, history } = this.props;
-    const { value } = this.state;
-    return (
-      <div className={classes.root}>
-        <Header history={history}>
-          <Button
-            className={classes.button}
-            onClick={this._save}
-            variant="contained"
-            color="secondary"
-          >
-            SAVE
-          </Button>
-          <Button
-            className={classes.button}
-            onClick={this.back}
-            variant="contained"
-            color="secondary"
-          >
-            BACK
-          </Button>
-        </Header>
-        <Paper className={classes.paper} elevation={1}>
-          <Input
-            autoFocus
-            className={classes.input}
-            value={value}
-            onChange={this.handleChange}
-            multiline
-          />
-        </Paper>
-      </div>
-    );
-  }
-
-  _save = async () => {
-    const currentId = this.props.match.params.id;
-    // const result = await this.props.saveNoteMutation({
-    await this.props.saveNoteMutation({
-      variables: {
-        id: currentId,
-        content: this.state.value
-      }
-    });
-    // const { id } = result.data.saveNote;
-    // if (currentId !== id) {
-    // this.props.history.push(`/note/${id}`);
-    this.props.history.push(`/`);
-    // }
-  };
-
-  back = () => {
-    this.props.history.push(`/`);
-  };
-}
-
 const NOTE_QUERY = gql`
   query NoteQuery($id: ID!) {
     note(id: $id) {
+      id
       content
       createdBy {
         name
@@ -120,7 +93,6 @@ const NOTE_QUERY = gql`
   }
 `;
 
-// todo make an update in local store
 const SAVENOTE_MUTATION = gql`
   mutation SaveNoteMutation($id: ID!, $content: String!) {
     saveNote(id: $id, content: $content) {
@@ -133,15 +105,27 @@ const SAVENOTE_MUTATION = gql`
   }
 `;
 
-export default compose(
-  graphql(NOTE_QUERY, {
-    name: 'data',
-    options: ownProps => {
-      const id = ownProps.match.params.id;
-      return {
-        variables: { id }
-      };
-    }
-  }),
-  graphql(SAVENOTE_MUTATION, { name: 'saveNoteMutation' })
-)(withStyles(styles)(Editor));
+const MyHeader = ({ history, save, classes }) => (
+  <Header history={history}>
+    <Button
+      className={classes.button}
+      onClick={save}
+      variant="contained"
+      color="secondary"
+    >
+      SAVE
+    </Button>
+    <Button
+      className={classes.button}
+      onClick={() => history.push(`/`)}
+      variant="contained"
+      color="secondary"
+    >
+      CANCEL
+    </Button>
+  </Header>
+);
+
+export default graphql(SAVENOTE_MUTATION, { name: 'saveNoteMutation' })(
+  withStyles(styles)(Editor)
+);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { graphql, compose } from 'react-apollo';
+import { graphql, Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -19,9 +19,7 @@ const styles = theme => ({
 });
 
 class ListNotes extends Component {
-  open = id => () => {
-    this.props.history.push(`/note/${id}`);
-  };
+  open = id => () => this.props.history.push(`/note/${id}`);
 
   delete = id => async () => {
     await this.props.deleteNoteMutation({
@@ -41,50 +39,40 @@ class ListNotes extends Component {
   };
 
   render() {
-    const { data } = this.props;
-    if (data && data.loading) {
-      return <div>Loading</div>;
-    }
-
-    if (data && data.error) {
-      return <div>Error</div>;
-    }
     const { classes, history } = this.props;
-    const { notes } = data;
     return (
-      <div>
-        <Header history={history}>
-          <Button
-            className={classes.button}
-            onClick={this.open('new')}
-            variant="contained"
-            color="secondary"
-          >
-            NEW NOTE
-          </Button>
-        </Header>
+      <div className={classes.root}>
+        <MyHeader classes={classes} history={history} />
+        <Query query={NOTES_QUERY} fetchPolicy="network-only">
+          {({ loading, error, data }) => {
+            if (loading) return 'Loading...';
+            if (error) return `Error! ${error.message}`;
 
-        <div className={classes.paper}>
-          {notes.map((e, i) => (
-            <Card key={e.id} className={classes.card}>
-              <CardHeader
-                className={classes.card}
-                title={shortTitle(e.content)}
-                subheader={`updated by ${e.createdBy.name} ${fromNow(
-                  e.updatedAt
-                )}`}
-              />
-              <CardActions>
-                <Button size="small" onClick={this.open(e.id)}>
-                  OPEN
-                </Button>
-                <Button size="small" onClick={this.delete(e.id)}>
-                  DELETE
-                </Button>
-              </CardActions>
-            </Card>
-          ))}
-        </div>
+            return (
+              <div className={classes.paper}>
+                {data.notes.map(e => (
+                  <Card key={e.id} className={classes.card}>
+                    <CardHeader
+                      className={classes.card}
+                      title={shortTitle(e.content)}
+                      subheader={`updated by ${e.createdBy.name} ${fromNow(
+                        e.updatedAt
+                      )}`}
+                    />
+                    <CardActions>
+                      <Button size="small" onClick={this.open(e.id)}>
+                        OPEN
+                      </Button>
+                      <Button size="small" onClick={this.delete(e.id)}>
+                        DELETE
+                      </Button>
+                    </CardActions>
+                  </Card>
+                ))}
+              </div>
+            );
+          }}
+        </Query>
       </div>
     );
   }
@@ -111,7 +99,19 @@ const DELETENOTE_MUTATION = gql`
   }
 `;
 
-export default compose(
-  graphql(NOTES_QUERY, { name: 'data' }),
-  graphql(DELETENOTE_MUTATION, { name: 'deleteNoteMutation' })
-)(withStyles(styles)(ListNotes));
+const MyHeader = ({ history, classes }) => (
+  <Header history={history}>
+    <Button
+      className={classes.button}
+      onClick={() => history.push(`/note/new`)}
+      variant="contained"
+      color="secondary"
+    >
+      NEW NOTE
+    </Button>
+  </Header>
+);
+
+export default graphql(DELETENOTE_MUTATION, { name: 'deleteNoteMutation' })(
+  withStyles(styles)(ListNotes)
+);
