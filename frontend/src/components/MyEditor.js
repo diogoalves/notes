@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { graphql, Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Input from '@material-ui/core/Input';
 import Header from './Header';
 import { NOTES_QUERY } from './ListNotes';
+import ActionButton from './ActionButton';
 
 class Editor extends Component {
   state = { value: '' };
@@ -16,14 +16,16 @@ class Editor extends Component {
   render() {
     const {
       classes,
-      history,
       match: {
         params: { id }
       }
     } = this.props;
     return (
       <div className={classes.root}>
-        <MyHeader classes={classes} history={history} save={this.save} />
+        <Header>
+          <ActionButton label="SAVE" action={this.save} />
+          <ActionButton label="CANCEL" action={this.cancel} />
+        </Header>
         <Query query={NOTES_QUERY} variables={{ id }}>
           {({ loading, error, data }) => {
             if (loading) return 'Loading...';
@@ -46,6 +48,7 @@ class Editor extends Component {
     );
   }
 
+  //TODO add an optimistic update
   save = async () => {
     const currentId = this.props.match.params.id;
     await this.props.saveNoteMutation({
@@ -65,6 +68,8 @@ class Editor extends Component {
     });
     this.props.history.push(`/`);
   };
+
+  cancel = () => this.props.history.push(`/`);
 }
 
 const styles = theme => ({
@@ -85,9 +90,6 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     width: '100%'
-  },
-  button: {
-    margin: theme.spacing.unit
   }
 });
 
@@ -103,27 +105,6 @@ const SAVENOTE_MUTATION = gql`
     }
   }
 `;
-
-const MyHeader = ({ history, save, classes }) => (
-  <Header history={history}>
-    <Button
-      className={classes.button}
-      onClick={save}
-      variant="contained"
-      color="secondary"
-    >
-      SAVE
-    </Button>
-    <Button
-      className={classes.button}
-      onClick={() => history.push(`/`)}
-      variant="contained"
-      color="secondary"
-    >
-      CANCEL
-    </Button>
-  </Header>
-);
 
 export default graphql(SAVENOTE_MUTATION, { name: 'saveNoteMutation' })(
   withStyles(styles)(Editor)
