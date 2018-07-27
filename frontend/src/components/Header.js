@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router';
+import { withApollo } from 'react-apollo';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,10 +25,12 @@ const styles = {
   }
 };
 
-class Header extends React.Component {
+class Header extends Component {
   handleLogout = () => {
+    const { client, history } = this.props;
     cleanLoggedUser();
-    this.props.history.push(`/`);
+    client.resetStore();
+    history.push(`/`);
   };
 
   render() {
@@ -64,4 +68,4 @@ class Header extends React.Component {
   }
 }
 
-export default withStyles(styles)(Header);
+export default withRouter(withApollo(withStyles(styles)(Header)));
