@@ -5,10 +5,10 @@ function notes (parent, args, context, info) {
   const userId = getUserId(context);
   const where = {
     createdBy: {
-      name: userId
+      id: userId
     }
   }
-  return context.db.query.notes(where, info);
+  return context.db.query.notes({ where }, info);
 }
 
 function note (parent, args, context, info) {
