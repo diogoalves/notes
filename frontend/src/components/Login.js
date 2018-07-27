@@ -10,6 +10,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { saveUserData } from '../utils';
 
+//TODO add login error feedback
+//TODO merge Login and SignUp components
 class Login extends Component {
   state = {
     email: '',
