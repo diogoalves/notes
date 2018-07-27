@@ -79,8 +79,8 @@ class ListNotes extends Component {
 }
 
 export const NOTES_QUERY = gql`
-  query NotesQuery {
-    notes {
+  query NotesQuery($id: ID) {
+    notes(id: $id) {
       id
       content
       updatedAt

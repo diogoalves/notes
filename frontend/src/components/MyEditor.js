@@ -24,11 +24,11 @@ class Editor extends Component {
     return (
       <div className={classes.root}>
         <MyHeader classes={classes} history={history} save={this.save} />
-        <Query query={NOTE_QUERY} variables={{ id }}>
+        <Query query={NOTES_QUERY} variables={{ id }}>
           {({ loading, error, data }) => {
             if (loading) return 'Loading...';
             if (error) return `Error! ${error.message}`;
-
+            const note = data.notes[0] || {};
             return (
               <Paper className={classes.paper} elevation={1}>
                 <Input
@@ -36,7 +36,7 @@ class Editor extends Component {
                   className={classes.input}
                   onChange={this.handleChange}
                   multiline
-                  defaultValue={data.note ? data.note.content : ''}
+                  defaultValue={note.content}
                 />
               </Paper>
             );
@@ -90,18 +90,6 @@ const styles = theme => ({
     margin: theme.spacing.unit
   }
 });
-
-const NOTE_QUERY = gql`
-  query NoteQuery($id: ID!) {
-    note(id: $id) {
-      id
-      content
-      createdBy {
-        name
-      }
-    }
-  }
-`;
 
 const SAVENOTE_MUTATION = gql`
   mutation SaveNoteMutation($id: ID!, $content: String!) {
