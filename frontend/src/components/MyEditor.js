@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Input from '@material-ui/core/Input';
 import Header from './Header';
+import { NOTES_QUERY } from './ListNotes';
 
 class Editor extends Component {
   state = { value: '' };
@@ -51,6 +52,15 @@ class Editor extends Component {
       variables: {
         id: currentId,
         content: this.state.value
+      },
+      update: (cache, { data: { saveNote } }) => {
+        const { notes } = cache.readQuery({ query: NOTES_QUERY });
+        cache.writeQuery({
+          query: NOTES_QUERY,
+          data: {
+            notes: [saveNote, ...notes.filter(e => e.id !== saveNote.id)]
+          }
+        });
       }
     });
     this.props.history.push(`/`);
@@ -98,6 +108,7 @@ const SAVENOTE_MUTATION = gql`
     saveNote(id: $id, content: $content) {
       id
       content
+      updatedAt
       createdBy {
         name
       }

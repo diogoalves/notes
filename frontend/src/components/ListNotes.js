@@ -43,7 +43,7 @@ class ListNotes extends Component {
     return (
       <div className={classes.root}>
         <MyHeader classes={classes} history={history} />
-        <Query query={NOTES_QUERY} fetchPolicy="network-only">
+        <Query query={NOTES_QUERY}>
           {({ loading, error, data }) => {
             if (loading) return 'Loading...';
             if (error) return `Error! ${error.message}`;
