@@ -1,3 +1,6 @@
+//TODO move to apollo-server v2
+//TODO installs graphql-import
+//TODO use local postgress instance
 const { GraphQLServer } = require('graphql-yoga')
 const { Prisma } = require('prisma-binding')
 const Query = require('./resolvers/Query')
@@ -17,7 +20,8 @@ const server = new GraphQLServer({
     ...req,
     db: new Prisma({
       typeDefs: 'src/generated/prisma.graphql',
-      endpoint: 'https://us1.prisma.sh/diogo-alves-b47d59/notes-database/dev',
+      // endpoint: 'https://us1.prisma.sh/diogo-alves-b47d59/notes-database/dev',
+      endpoint: 'http://localhost:4466',
       secret: 'mysecret123',
       debug: true,
     }),

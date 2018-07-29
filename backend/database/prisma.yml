@@ -1,6 +1,7 @@
 # The HTTP endpoint for your Prisma API
 #endpoint: ''
-endpoint: https://us1.prisma.sh/diogo-alves-b47d59/notes-database/dev
+#endpoint: https://us1.prisma.sh/diogo-alves-b47d59/notes-database/dev
+endpoint: http://localhost:4466
 
 # Points to the file that holds your data model
 datamodel: datamodel.graphql
