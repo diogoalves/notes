@@ -8,6 +8,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Typography from '@material-ui/core/Typography';
 import { saveUserData } from '../utils';
 
 //TODO add login error feedback
@@ -15,34 +16,41 @@ import { saveUserData } from '../utils';
 class Login extends Component {
   state = {
     email: '',
-    password: ''
+    password: '',
+    error: null
   };
 
   handleChange = field => event => {
     this.setState({
-      [field]: event.target.value.trim()
+      [field]: event.target.value.trim(),
+      error: null
     });
   };
 
   handleSubmit = async event => {
     event.preventDefault();
     const { email, password } = this.state;
-    const result = await this.props.loginMutation({
-      variables: {
-        email,
-        password
-      }
-    });
-    const {
-      token,
-      user: { name }
-    } = result.data.login;
-    saveUserData(token, name);
-    this.props.history.push(`/`);
+    try {
+      const result = await this.props.loginMutation({
+        variables: {
+          email,
+          password
+        }
+      });
+      const {
+        token,
+        user: { name }
+      } = result.data.login;
+      saveUserData(token, name);
+      this.props.history.push(`/`);
+    } catch (error) {
+      const message = error.message.replace('GraphQL error: ', '');
+      this.setState({ ...this.state, error: message });
+    }
   };
 
   render() {
-    const { email, password } = this.state;
+    const { email, password, error } = this.state;
     return (
       <Dialog open aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Login</DialogTitle>
@@ -67,6 +75,11 @@ class Login extends Component {
               onChange={this.handleChange('password')}
               value={password}
             />
+            {error && (
+              <Typography variant="caption" gutterBottom align="center">
+                {error}
+              </Typography>
+            )}
           </form>
         </DialogContent>
         <DialogActions>
