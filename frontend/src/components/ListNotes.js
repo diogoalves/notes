@@ -91,7 +91,6 @@ export const NOTES_QUERY = gql`
   }
 `;
 
-//TODO add an optimistic update
 const DELETENOTE_MUTATION = gql`
   mutation DeleteNoteMutation($id: ID!) {
     deleteNote(id: $id) {

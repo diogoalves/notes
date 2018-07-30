@@ -48,7 +48,6 @@ class Editor extends Component {
     );
   }
 
-  //TODO add an optimistic update
   save = async () => {
     const currentId = this.props.match.params.id;
     await this.props.saveNoteMutation({
