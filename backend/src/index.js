@@ -1,7 +1,5 @@
-//TODO move to apollo-server v2
-//TODO installs graphql-import
-//TODO use local postgress instance
-const { GraphQLServer } = require('graphql-yoga')
+const { ApolloServer, gql } = require('apollo-server');
+const { importSchema } = require('graphql-import');
 const { Prisma } = require('prisma-binding')
 const Query = require('./resolvers/Query')
 const Mutation = require('./resolvers/Mutation')
@@ -13,8 +11,8 @@ const resolvers = {
   AuthPayload
 }
 
-const server = new GraphQLServer({
-  typeDefs: './src/schema.graphql',
+const server = new ApolloServer({
+  typeDefs: importSchema('src/schema.graphql'),
   resolvers,
   context: req => ({
     ...req,
@@ -28,4 +26,8 @@ const server = new GraphQLServer({
   }),
 })
 
-server.start(() => console.log(`Server is running on http://localhost:4000`))
+// server.start(() => console.log(`Server is running on http://localhost:4000`))
+
+server.listen().then(({ url }) => {
+  console.log(`🚀  Server ready at ${url}`);
+});
