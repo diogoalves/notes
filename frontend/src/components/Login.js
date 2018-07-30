@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -11,13 +10,13 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Typography from '@material-ui/core/Typography';
 import { saveUserData } from '../utils';
 
-//TODO add login error feedback
-//TODO merge Login and SignUp components
 class Login extends Component {
   state = {
     email: '',
     password: '',
-    error: null
+    error: null,
+    isSignUp: false,
+    name: ''
   };
 
   handleChange = field => event => {
@@ -27,22 +26,40 @@ class Login extends Component {
     });
   };
 
+  toggleSignUp = () => {
+    this.setState(currentState => ({
+      ...currentState,
+      isSignUp: !currentState.isSignUp,
+      error: null
+    }));
+  };
+
   handleSubmit = async event => {
     event.preventDefault();
-    const { email, password } = this.state;
+    const { email, password, isSignUp, name } = this.state;
     try {
-      const result = await this.props.loginMutation({
-        variables: {
-          email,
-          password
-        }
-      });
-      const {
-        token,
-        user: { name }
-      } = result.data.login;
-      saveUserData(token, name);
-      this.props.history.push(`/`);
+      if (isSignUp) {
+        const result = await this.props.signUpMutation({
+          variables: {
+            email,
+            password,
+            name
+          }
+        });
+        const { token, user } = result.data.signup;
+        saveUserData(token, user.name);
+        this.props.history.push(`/`);
+      } else {
+        const result = await this.props.loginMutation({
+          variables: {
+            email,
+            password
+          }
+        });
+        const { token, user } = result.data.login;
+        saveUserData(token, user.name);
+        this.props.history.push(`/`);
+      }
     } catch (error) {
       const message = error.message.replace('GraphQL error: ', '');
       this.setState({ ...this.state, error: message });
@@ -50,12 +67,24 @@ class Login extends Component {
   };
 
   render() {
-    const { email, password, error } = this.state;
+    const { email, password, isSignUp, name, error } = this.state;
     return (
       <Dialog open aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Login</DialogTitle>
         <DialogContent>
           <form onSubmit={this.handleSubmit}>
+            {isSignUp && (
+              <TextField
+                autoFocus
+                margin="dense"
+                id="name"
+                label="Name"
+                type="text"
+                fullWidth
+                onChange={this.handleChange('name')}
+                value={name}
+              />
+            )}
             <TextField
               autoFocus
               margin="dense"
@@ -82,18 +111,41 @@ class Login extends Component {
             )}
           </form>
         </DialogContent>
-        <DialogActions>
-          <Link to="/signUp">
-            <Button color="primary">Need to create an account?</Button>
-          </Link>
-          <Button onClick={this.handleSubmit} color="primary">
-            Login
-          </Button>
-        </DialogActions>
+        {isSignUp && (
+          <DialogActions>
+            <Button color="primary" onClick={this.toggleSignUp}>
+              Already have an account?
+            </Button>
+            <Button onClick={this.handleSubmit} color="primary">
+              Sign Up
+            </Button>
+          </DialogActions>
+        )}
+        {!isSignUp && (
+          <DialogActions>
+            <Button color="primary" onClick={this.toggleSignUp}>
+              Need to create an account?
+            </Button>
+            <Button onClick={this.handleSubmit} color="primary">
+              Login
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
     );
   }
 }
+
+const SIGNUP_MUTATION = gql`
+  mutation SignupMutation($email: String!, $password: String!, $name: String!) {
+    signup(email: $email, password: $password, name: $name) {
+      token
+      user {
+        name
+      }
+    }
+  }
+`;
 
 const LOGIN_MUTATION = gql`
   mutation LoginMutation($email: String!, $password: String!) {
@@ -106,4 +158,7 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
-export default graphql(LOGIN_MUTATION, { name: 'loginMutation' })(Login);
+export default compose(
+  graphql(SIGNUP_MUTATION, { name: 'signUpMutation' }),
+  graphql(LOGIN_MUTATION, { name: 'loginMutation' })
+)(Login);
